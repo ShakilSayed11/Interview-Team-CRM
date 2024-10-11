@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduCRM Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #858796;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #5a5c69;
+        }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--light-color);
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: var(--primary-color);
+            background-image: linear-gradient(180deg, var(--primary-color) 10%, #224abe 100%);
+            background-size: cover;
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,.8);
+            padding: 1rem;
+        }
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background-color: rgba(255,255,255,.1);
+        }
+        .sidebar .nav-link.active {
+            color: #fff;
+            font-weight: 700;
+        }
+        .topbar {
+            height: 4.375rem;
+            box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15);
+        }
+        .card {
+            box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15);
+        }
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+        }
+        .btn-icon-split {
+            padding: 0;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: stretch;
+            justify-content: center;
+        }
+        .btn-icon-split .icon {
+            background: rgba(0,0,0,.15);
+            display: inline-block;
+            padding: .375rem .75rem;
+        }
+        .btn-icon-split .text {
+            display: inline-block;
+            padding: .375rem .75rem;
+        }
+        #calendar {
+            height: 600px;
+        }
+        .interview-stage {
+            background-color: #f8f9fc;
+            border: 1px solid #e3e6f0;
+            border-radius: .35rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .interview-stage h5 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: .5rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar-wrapper">
+            <div class="sidebar-heading text-center py-4 text-white fs-4 fw-bold text-uppercase">
+                <i class="fas fa-graduation-cap me-2"></i>EduCRM Pro
+            </div>
+            <div class="list-group list-group-flush my-3">
+                <a href="#" class="nav-link active" onclick="showView('dashboard')">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+                <a href="#" class="nav-link" onclick="showView('students')">
+                    <i class="fas fa-user-graduate me-2"></i>Students
+                </a>
+                <a href="#" class="nav-link" onclick="showView('interviews')">
+                    <i class="fas fa-comments me-2"></i>Interviews
+                </a>
+                <a href="#" class="nav-link" onclick="showView('calendar')">
+                    <i class="fas fa-calendar-alt me-2"></i>Calendar
+                </a>
+                <a href="#" class="nav-link" onclick="showView('reports')">
+                    <i class="fas fa-chart-bar me-2"></i>Reports
+                </a>
+                <a href="#" class="nav-link" onclick="showView('settings')">
+                    <i class="fas fa-cog me-2"></i>Settings
+                </a>
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
+                    <h2 class="fs-2 m-0" id="page-title">Dashboard</h2>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle second-text fw-bold" href="#" id="navbarDropdown"
+                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-2"></i>John Doe
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="#">Profile</a></li>
+                                <li><a class="dropdown-item" href="#">Settings</a></li>
+                                <li><a class="dropdown-item" href="#">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="container-fluid px-4">
+                <div id="dashboard" class="row g-3 my-2">
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
+                            <div>
+                                <h3 class="fs-2" id="totalStudents">0</h3>
+                                <p class="fs-5">Students</p>
+                            </div>
+                            <i class="fas fa-user-graduate fs-1 primary-text border rounded-full secondary-bg p-3"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
+                            <div>
+                                <h3 class="fs-2" id="totalInterviews">0</h3>
+                                <p class="fs-5">Interviews</p>
+                            </div>
+                            <i class="fas fa-comments fs-1 primary-text border rounded-full secondary-bg p-3"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
+                            <div>
+                                <h3 class="fs-2" id="successRate">0%</h3>
+                                <p class="fs-5">Success Rate</p>
+                            </div>
+                            <i class="fas fa-chart-line fs-1 primary-text border rounded-full secondary-bg p-3"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
+                            <div>
+                                <h3 class="fs-2" id="upcomingInterviews">0</h3>
+                                <p class="fs-5">Upcoming</p>
+                            </div>
+                            <i class="fas fa-calendar fs-1 primary-text border rounded-full secondary-bg p-3"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row my-5">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title">Interview Outcomes</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="interviewOutcomesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title">Interviews by Centre</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="interviewsByCentreChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row my-5">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Recent Interviews</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Student ID</th>
+                                                <th>Student Name</th>
+                                                <th>Centre</th>
+                                                <th>Interview Date</th>
+                                                <th>Outcome</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recentInterviewsTable">
+                                            <!-- Recent interviews will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="students" class="container-fluid px-4 d-none">
+                <div class="row my-5">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title">Student Management</h5>
+                                <button class="btn btn-primary btn-sm" onclick="showAddStudentModal()">
+                                    <i class="fas fa-plus"></i> Add New Student
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped" id="studentsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Student ID</th>
+                                                <th>Name</th>
+                                                <th>Centre</th>
+                                                <th>Last Interview</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Student data will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="interviews" class="container-fluid px-4 d-none">
+                <div class="row my-5">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title">Interview Management</h5>
+                                <button class="btn btn-primary btn-sm" onclick="showAddInterviewModal()">
+                                    <i class="fas fa-plus"></i> Schedule New Interview
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="interview-stage">
+                                    <h5>Upcoming Interviews</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped" id="upcomingInterviewsTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Student ID</th>
+                                                    <th>Name</th>
+                                                    <th>Centre</th>
+                                                    <th>Interview Date</th>
+                                                    <th>Interviewer</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Upcoming interview data will be populated here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="interview-stage">
+                                    <h5>Completed Interviews</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped" id="completedInterviewsTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Student ID</th>
+                                                    <th>Name</th>
+                                                    <th>Centre</th>
+                                                    <th>Interview Date</th>
+                                    <th>Outcome</th>
+                                    <th>Interviewer</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Completed interview data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <div id="calendar" class="container-fluid px-4 d-none">
+                <div class="row my-5">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Interview Calendar</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="interviewCalendar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="reports" class="container-fluid px-4 d-none">
+                <div class="row my-5">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Success Rate by Centre</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="successRateByCentreChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Interviews by Month</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="interviewsByMonthChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row my-5">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Interviewer Performance</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped" id="interviewerPerformanceTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Interviewer</th>
+                                                <th>Total Interviews</th>
+                                                <th>Successful</th>
+                                                <th>Unsuccessful</th>
+                                                <th>Pending</th>
+                                                <th>Success Rate</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Interviewer performance data will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings" class="container-fluid px-4 d-none">
+                <div class="row my-5">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">User Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="userSettingsForm">
+                                    <div class="mb-3">
+                                        <label for="userName" class="form-label">Name</label>
+                                        <input type="text" class="form-control" id="userName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="userEmail" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="userEmail" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="userPassword" class="form-label">New Password</label>
+                                        <input type="password" class="form-control" id="userPassword">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">System Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="systemSettingsForm">
+                                    <div class="mb-3">
+                                        <label for="defaultCentre" class="form-label">Default Centre</label>
+                                        <input type="text" class="form-control" id="defaultCentre">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="maxAttempts" class="form-label">Max Interview Attempts</label>
+                                        <input type="number" class="form-control" id="maxAttempts" min="1" max="5">
+                                    </div>
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="enableNotifications">
+                                        <label class="form-check-label" for="enableNotifications">Enable Email Notifications</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Student</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addStudentForm">
+                        <div class="mb-3">
+                            <label for="newStudentId" class="form-label">Student ID</label>
+                            <input type="text" class="form-control" id="newStudentId" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newStudentName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="newStudentName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newStudentCentre" class="form-label">Centre</label>
+                            <input type="text" class="form-control" id="newStudentCentre" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="addNewStudent()">Add Student</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addInterviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Schedule New Interview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addInterviewForm">
+                        <div class="mb-3">
+                            <label for="interviewStudentId" class="form-label">Student ID</label>
+                            <input type="text" class="form-control" id="interviewStudentId" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="interviewDate" class="form-label">Interview Date</label>
+                            <input type="datetime-local" class="form-control" id="interviewDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="interviewerName" class="form-label">Interviewer Name</label>
+                            <input type="text" class="form-control" id="interviewerName" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="scheduleNewInterview()">Schedule Interview</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock data
+        let students = [
+            { id: "S001", name: "John Doe", centre: "Centre A", lastInterview: "2024-10-01", status: "Successful" },
+            { id: "S002", name: "Jane Smith", centre: "Centre B", lastInterview: "2024-10-02", status: "Pending" },
+            { id: "S003", name: "Bob Johnson", centre: "Centre C", lastInterview: "2024-10-03", status: "Unsuccessful" }
+        ];
+
+        let interviews = [
+            { id: 1, studentId: "S001", date: "2024-10-01", outcome: "Successful", interviewer: "Alice" },
+            { id: 2, studentId: "S002", date: "2024-10-02", outcome: "Pending", interviewer: "Bob" },
+            { id: 3, studentId: "S003", date: "2024-10-03", outcome: "Unsuccessful", interviewer: "Charlie" }
+        ];
+
+        function showView(viewId) {
+            document.querySelectorAll('.container-fluid').forEach(el => el.classList.add('d-none'));
+            document.getElementById(viewId).classList.remove('d-none');
+            document.getElementById('page-title').textContent = viewId.charAt(0).toUpperCase() + viewId.slice(1);
+            updateView(viewId);
+        }
+
+        function updateView(viewId) {
+            switch(viewId) {
+                case 'dashboard':
+                    updateDashboard();
+                    break;
+                case 'students':
+                    updateStudentsTable();
+                    break;
+                case 'interviews':
+                    updateInterviewsTables();
+                    break;
+                case 'calendar':
+                    initializeCalendar();
+                    break;
+                case 'reports':
+                    updateReports();
+                    break;
+            }
+        }
+
+        function updateDashboard() {
+            document.getElementById('totalStudents').textContent = students.length;
+            document.getElementById('totalInterviews').textContent = interviews.length;
+            document.getElementById('successRate').textContent = calculateSuccessRate() + '%';
+            document.getElementById('upcomingInterviews').textContent = interviews.filter(i => i.outcome === 'Pending').length;
+
+            updateInterviewOutcomesChart();
+            updateInterviewsByCentreChart();
+            updateRecentInterviewsTable();
+        }
+
+        function updateInterviewOutcomesChart() {
+            const ctx = document.getElementById('interviewOutcomesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Successful', 'Unsuccessful', 'Pending'],
+                    datasets: [{
+                        data: [
+                            interviews.filter(i => i.outcome === 'Successful').length,
+                            interviews.filter(i => i.outcome === 'Unsuccessful').length,
+                            interviews.filter(i => i.outcome === 'Pending').length
+                        ],
+                        backgroundColor: ['#1cc88a', '#e74a3b', '#f6c23e']
+                    }]
+                }
+            });
+        }
+
+        function updateInterviewsByCentreChart() {
+            const centres = [...new Set(students.map(s => s.centre))];
+            const interviewsByCentre = centres.map(centre => 
+                interviews.filter(i => students.find(s => s.id === i.studentId).centre === centre).length
+            );
+
+            const ctx = document.getElementById('interviewsByCentreChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: centres,
+                    datasets: [{
+                        label: 'Interviews',
+                        data: interviewsByCentre,
+                        backgroundColor: '#4e73df'
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateRecentInterviewsTable() {
+            const tableBody = document.getElementById('recentInterviewsTable');
+            tableBody.innerHTML = '';
+            interviews.slice(-5).reverse().forEach(interview => {
+                const student = students.find(s => s.id === interview.studentId);
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.centre}</td>
+                    <td>${interview.date}</td>
+                    <td>${interview.outcome}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewInterviewDetails(${interview.id})">View</button>
+                    </td>
+                `;
+            });
+        }
+
+        function updateStudentsTable() {
+            const tableBody = document.querySelector('#studentsTable tbody');
+            tableBody.innerHTML = '';
+            students.forEach(student => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.centre}</td>
+                    <td>${student.lastInterview}</td>
+                    <td>${student.status}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewStudentDetails('${student.id}')">View</button>
+                        <button class="btn btn-sm btn-secondary" onclick="editStudent('${student.id}')">Edit</button>
+                    </td>
+                `;
+            });
+        }
+
+        function updateInterviewsTables() {
+            const upcomingTableBody = document.querySelector('#upcomingInterviewsTable tbody');
+            const completedTableBody = document.querySelector('#completedInterviewsTable tbody');
+            upcomingTableBody.innerHTML = '';
+            completedTableBody.innerHTML = '';
+
+            interviews.forEach(interview => {
+                const student = students.find(s => s.id === interview.studentId);
+                const row = (interview.outcome === 'Pending' ? upcomingTableBody : completedTableBody).insertRow();
+                row.innerHTML = `
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.centre}</td>
+                    <td>${interview.date}</td>
+                    <td>${interview.interviewer}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewInterviewDetails(${interview.id})">View</button>
+                        ${interview.outcome === 'Pending' ? `<button class="btn btn-sm btn-success" onclick="completeInterview(${interview.id})">Complete</button>` : ''}
+                    </td>
+                `;
+            });
+        }
+
+        function initializeCalendar() {
+            const calendarEl = document.getElementById('interviewCalendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: interviews.map(interview => ({
+                    title: `Interview: ${students.find(s => s.id === interview.studentId).name}`,
+                    start: interview.date,
+                    allDay: false
+                })),
+                eventClick: function(info) {
+                    const interview = interviews.find(i => i.date === info.event.startStr);
+                    viewInterviewDetails(interview.id);
+                }
+            });
+            calendar.render();
+        }
+
+        function updateReports() {
+            updateSuccessRateByCentreChart();
+            updateInterviewsByMonthChart();
+            updateInterviewerPerformanceTable();
+        }
+
+        function updateSuccessRateByCentreChart() {
+            const centres = [...new Set(students.map(s => s.centre))];
+            const successRates = centres.map(centre => {
+                const centreInterviews = interviews.filter(i => students.find(s => s.id === i.studentId).centre === centre);
+                const successfulInterviews = centreInterviews.filter(i => i.outcome === 'Successful').length;
+                return (successfulInterviews / centreInterviews.length) * 100 || 0;
+            });
+
+            const ctx = document.getElementById('successRateByCentreChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: centres,
+                    datasets: [{
+                        label: 'Success Rate (%)',
+                        data: successRates,
+                        backgroundColor: '#1cc88a'
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateInterviewsByMonthChart() {
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const interviewsByMonth = Array(12).fill(0);
+
+            interviews.forEach(interview => {
+                const month = new Date(interview.date).getMonth();
+                interviewsByMonth[month]++;
+            });
+
+            const ctx = document.getElementById('interviewsByMonthChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: monthNames,
+                    datasets: [{
+                        label: 'Interviews',
+                        data: interviewsByMonth,
+                        borderColor: '#4e73df',
+                        tension: 0.1
+                    }]
+                }
+            });
+        }
+
+        function updateInterviewerPerformanceTable() {
+            const interviewers = [...new Set(interviews.map(i => i.interviewer))];
+            const tableBody = document.querySelector('#interviewerPerformanceTable tbody');
+            tableBody.innerHTML = '';
+
+            interviewers.forEach(interviewer => {
+                const interviewerInterviews = interviews.filter(i => i.interviewer === interviewer);
+                const successful = interviewerInterviews.filter(i => i.outcome === 'Successful').length;
+                const unsuccessful = interviewerInterviews.filter(i => i.outcome === 'Unsuccessful').length;
+                const pending = interviewerInterviews.filter(i => i.outcome === 'Pending').length;
+                const successRate = (successful / interviewerInterviews.length) * 100 || 0;
+
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${interviewer}</td>
+                    <td>${interviewerInterviews.length}</td>
+                    <td>${successful}</td>
+                    <td>${unsuccessful}</td>
+                    <td>${pending}</td>
+                    <td>${successRate.toFixed(2)}%</td>
+                `;
+            });
+        }
+
+        function calculateSuccessRate() {
+            const successfulInterviews = interviews.filter(i => i.outcome === 'Successful').length;
+            return ((successfulInterviews / interviews.length) * 100).toFixed(2);
+        }
+
+        function showAddStudentModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addStudentModal'));
+            modal.show();
+        }
+
+        function addNewStudent() {
+            const id = document.getElementById('newStudentId').value;
+            const name = document.getElementById('newStudentName').value;
+            const centre = document.getElementById('newStudentCentre').value;
+
+            students.push({ id, name, centre, lastInterview: 'N/A', status: 'New' });
+            updateStudentsTable();
+            bootstrap.Modal.getInstance(document.getElementById('addStudentModal')).hide();
+        }
+
+        function showAddInterviewModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addInterviewModal'));
+            modal.show();
+        }
+
+        function scheduleNewInterview() {
+            const studentId = document.getElementById('interviewStudentId').value;
+            const date = document.getElementById('interviewDate').value;
+            const interviewer = document.getElementById('interviewerName').value;
+
+            interviews.push({
+                id: interviews.length + 1,
+                studentId,
+                date,
+                outcome: 'Pending',
+                interviewer
+            });
+
+            updateInterviewsTables();
+            bootstrap.Modal.getInstance(document.getElementById('addInterviewModal')).hide();
+        }
+
+        function viewStudentDetails(studentId) {
+            const student = students.find(s => s.id === studentId);
+            alert(`Viewing details for student: ${student.name}`);
+            // Implement a more sophisticated view, perhaps opening a modal with detailed information
+        }
+
+        function editStudent(studentId) {
+            const student = students.find(s => s.id === studentId);
+            alert(`Editing student: ${student.name}`);
+            // Implement edit functionality, perhaps opening a modal with a form to edit student details
+        }
+
+        function viewInterviewDetails(interviewId) {
+            const interview = interviews.find(i => i.id === interviewId);
+            const student = students.find(s => s.id === interview.studentId);
+            alert(`Viewing details for interview with ${student.name} on ${interview.date}`);
+            // Implement a more sophisticated view, perhaps opening a modal with detailed information
+        }
+
+        function completeInterview(interviewId) {
+            const interview = interviews.find(i => i.id === interviewId);
+            const outcome = prompt("Enter interview outcome (Successful/Unsuccessful):");
+            if (outcome === 'Successful' || outcome === 'Unsuccessful') {
+                interview.outcome = outcome;
+                updateInterviewsTables();
+                updateDashboard();
+            } else {
+                alert("Invalid outcome. Please enter 'Successful' or 'Unsuccessful'.");
+            }
+        }
+
+        // Event listeners
+        document.getElementById('menu-toggle').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('wrapper').classList.toggle('toggled');
+        });
+
+        document.getElementById('userSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('User settings updated successfully!');
+        });
+
+        document.getElementById('systemSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('System settings updated successfully!');
+        });
+
+        // Initialize the dashboard view
+        showView('dashboard');
+    </script>
+</body>
+</html>
